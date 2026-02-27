@@ -35,10 +35,10 @@ public class MyChomp {
 
         int[] rows = {r1, r2, r3};
 
+        boolean winningboard = false;
+
         for (int row = 0; row < 3; row++) {
             int length = rows[row];
-
-            if (length == 0) continue;
 
             for (int col = 1; col <= length; col++) {
 
@@ -64,8 +64,17 @@ public class MyChomp {
                 // if this results in a valid non-increasing board
                 if (nr1 >= nr2 && nr2 >= nr3) {
                     System.out.println(nr1 + "," + nr2 + "," + nr3);
+                    if(nr1==1&&nr2==0&&nr3==0){
+                        winningboard = true;
+                    }
                 }
             }
+        }
+
+        if(winningboard==true){
+            System.out.println("1,0,0 is possible");
+        } else{
+            System.out.println("1,0,0 is not possible");
         }
 
         System.out.println("___________________");
