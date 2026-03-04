@@ -71,6 +71,7 @@ public class MyChomp {
             }
         }
 
+        //winningboard or not
         if(winningboard==true){
             System.out.println("1,0,0 is possible");
         } else{
