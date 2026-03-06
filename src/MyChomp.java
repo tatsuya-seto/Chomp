@@ -67,17 +67,35 @@ public class MyChomp {
                     if(nr1==1&&nr2==0&&nr3==0){
                         winningboard = true;
                     }
+                    if(nr1==2&&nr2==1&&nr3==0){
+                        winningboard = true;
+                    }
+                    if(nr1==1&&nr2==0&&nr3==0){
+                        winningboard = true;
+                    }
+                    if(nr1==1&&nr2==0&&nr3==0){
+                        winningboard = true;
+                    }
+                    if(nr1==1&&nr2==0&&nr3==0){
+                        winningboard = true;
+                    }
+                    if(nr1==1&&nr2==0&&nr3==0){
+                        winningboard = true;
+                    }
+                    if(nr1==1&&nr2==0&&nr3==0){
+                        winningboard = true;
+                    }
                 }
             }
         }
 
         //winningboard or not
         if(winningboard==true){
-            System.out.println("1,0,0 is possible");
+            System.out.println("WIN BOARD 1,0,0 is possible");
         } else{
-            System.out.println("1,0,0 is not possible");
+            System.out.println("LOSE BOARD 1,0,0 is not possible");
         }
 
-        System.out.println("___________________");
+        System.out.println("_______________________________________");
     }
 }
