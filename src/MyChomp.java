@@ -26,10 +26,19 @@ public class MyChomp {
             }
         }
 
-        System.out.println("\nWINNING BOARDS:");
-        printBoards(winningBoards, winningCount);
+        System.out.println("\nWINNING BOARDS (with optimal move):");
+
+        for(int i=0;i<winningCount;i++){
+            int r1 = winningBoards[i][0];
+            int r2 = winningBoards[i][1];
+            int r3 = winningBoards[i][2];
+
+            System.out.print(r1 + "," + r2 + "," + r3 + ": ");
+            optimalMove(r1,r2,r3);
+        }
 
         System.out.println("\nLOSING BOARDS:");
+
         printBoards(losingBoards, losingCount);
     }
 
@@ -108,6 +117,54 @@ public class MyChomp {
         winningBoards[winningCount][1]=r2;
         winningBoards[winningCount][2]=r3;
         winningCount++;
+    }
+
+    public void optimalMove(int r1, int r2, int r3){
+
+        int[] rows = {r1,r2,r3};
+
+        for(int row=0; row<3; row++){
+
+            int length = rows[row];
+
+            for(int col=1; col<=length; col++){
+
+                int nr1=r1;
+                int nr2=r2;
+                int nr3=r3;
+
+                int newVal = col-1;
+
+                if(row==0){
+                    nr1 = newVal;
+                    nr2 = Math.min(nr2,newVal);
+                    nr3 = Math.min(nr3,newVal);
+                }
+                else if(row==1){
+                    nr2 = newVal;
+                    nr3 = Math.min(nr3,newVal);
+                }
+                else{
+                    nr3 = newVal;
+                }
+
+                if(nr1==0) continue;
+
+                if(nr1>=nr2 && nr2>=nr3){
+
+                    if(isLosingBoard(nr1,nr2,nr3)){
+
+                        int x = col-1;
+                        int y = row;
+
+                        System.out.println("click at (" + x + "," + y + ")");
+                        return;
+                    }
+                }
+            }
+        }
+
+        System.out.println("no winning move");
     }
 
     public void printBoards(int[][] boards,int count){
