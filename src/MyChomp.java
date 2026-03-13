@@ -119,6 +119,7 @@ public class MyChomp {
         winningCount++;
     }
 
+    //Calculating the best move by matching losing boards
     public void optimalMove(int r1, int r2, int r3){
 
         int[] rows = {r1,r2,r3};
