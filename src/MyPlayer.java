@@ -1,16 +1,20 @@
 import java.awt.*;
 
+
 public class MyPlayer {
     public Chip[][] gameBoard;
     public int[] columns;
+    int[][] losingBoards = new int[20][3];
+    int[][] winningBoards = new int[20][3];
+
+    int losingCount = 0;
+    int winningCount = 0;
+
+
 
     public MyPlayer() {
         columns = new int[10];
 
-        /***
-         * This code will run just once, when the game opens.
-         * Add your code here.
-         */
     }
 
     public Point move(Chip[][] pBoard) {
