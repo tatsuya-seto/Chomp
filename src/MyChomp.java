@@ -24,7 +24,7 @@ public class MyChomp {
                     evaluateBoard(r1,r2,r3);
                 }
             }
-        }//chomp
+        }
 
         System.out.println("\nWINNING BOARDS (with optimal move):");
 

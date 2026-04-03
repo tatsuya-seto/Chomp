@@ -189,7 +189,7 @@ public class MyPlayer {
                         int x = col - 1;
                         int y = row;
 
-                        return new Point(y, x);
+                        return new Point(y, x); //returning move coordinates
                     }
                 }
             }
