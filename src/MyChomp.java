@@ -39,7 +39,7 @@ public class MyChomp {
 
         System.out.println("\nLOSING BOARDS:");
 
-        printBoards(losingBoards, losingCount);
+        printBoards(losingBoards, losingCount);//printing all losing boards
     }
 
     public void evaluateBoard(int r1,int r2,int r3){
