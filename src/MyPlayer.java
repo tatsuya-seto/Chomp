@@ -16,7 +16,7 @@ public class MyPlayer {
 
         System.out.println("MyPlayer Move");
 
-        gameBoard = pBoard;
+        gameBoard = pBoard; //Current State of Board
 
         int[] board = getBoardState(pBoard);
         int r1 = board[0];
