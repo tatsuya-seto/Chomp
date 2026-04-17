@@ -61,6 +61,34 @@ public class MyPlayer {
         return pBoard[row][col] != null && pBoard[row][col].isAlive;
     }
 
+    // Finds a move that sends opponent to a losing board
+    public Point optimalMove(int[] rows) {
+        int size = rows.length;
+
+        for (int row = 0; row < size; row++) {
+            int length = rows[row];
+
+            for (int col = 0; col < length; col++) {
+                // Skip poison square move directly here unless forced by fallback
+                if (row == 0 && col == 0) {
+                    continue;
+                }
+
+                int[] next = applyMove(rows, row, col);
+
+                // Do not allow empty-top-row states in main search
+                if (next[0] == 0) {
+                    continue;
+                }
+
+                if (!isWinning(next)) {
+                    return new Point(row, col); // coordinate starts at 0,0
+                }
+            }
+        }
+
+        return null;
+    }
 
     // Returns true if current state is winning for player to move
     public boolean isWinning(int[] rows) {
