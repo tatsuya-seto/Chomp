@@ -1,41 +1,36 @@
 import java.awt.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyPlayer {
     public Chip[][] gameBoard;
 
-    int[][] losingBoards = new int[20][3];
-    int[][] winningBoards = new int[20][3];
-
-    int losingCount = 0;
-    int winningCount = 0;
+    // Memo: board state -> isWinning
+    private Map<String, Boolean> memo = new HashMap<>();
 
     public MyPlayer() {
     }
 
     public Point move(Chip[][] pBoard) {
-
         System.out.println("MyPlayer Move");
 
-        gameBoard = pBoard; //Current State of Board
+        gameBoard = pBoard;
 
-        int[] board = getBoardState(pBoard);
-        int r1 = board[0];
-        int r2 = board[1];
-        int r3 = board[2];
+        int[] rows = getBoardState(pBoard);
 
-        System.out.println("Current board: " + r1 + "," + r2 + "," + r3);
+        System.out.println("Current board: " + Arrays.toString(rows));
 
-        buildBoards();
-
-        Point bestMove = optimalMove(r1, r2, r3);
+        Point bestMove = optimalMove(rows);
 
         if (bestMove != null) {
             System.out.println("Choosing: (" + bestMove.x + "," + bestMove.y + ")");
-            return bestMove;
-        }//good
+            return bestMove; // x = row, y = col
+        }
 
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+        // Fallback: first alive chip
+        for (int row = 0; row < pBoard.length; row++) {
+            for (int col = 0; col < pBoard[row].length; col++) {
                 if (isChipPresent(pBoard, row, col)) {
                     return new Point(row, col);
                 }
@@ -46,17 +41,16 @@ public class MyPlayer {
     }
 
     public int[] getBoardState(Chip[][] pBoard) {
-        int[] rows = new int[3];
+        int size = pBoard.length;
+        int[] rows = new int[size];
 
-        for (int row = 0; row < 3; row++) {
+        for (int row = 0; row < size; row++) {
             int count = 0;
-
-            for (int col = 0; col < 3; col++) {
+            for (int col = 0; col < pBoard[row].length; col++) {
                 if (isChipPresent(pBoard, row, col)) {
                     count++;
                 }
             }
-
             rows[row] = count;
         }
 
@@ -67,134 +61,82 @@ public class MyPlayer {
         return pBoard[row][col] != null && pBoard[row][col].isAlive;
     }
 
-    public void buildBoards() {
-        losingCount = 0;
-        winningCount = 0;
 
-        addLosingBoard(1, 0, 0);
+    // Returns true if current state is winning for player to move
+    public boolean isWinning(int[] rows) {
+        String key = encode(rows);
 
-        for (int r1 = 1; r1 <= 3; r1++) {
-            for (int r2 = 0; r2 <= r1; r2++) {
-                for (int r3 = 0; r3 <= r2; r3++) {
-
-                    if (r1 == 1 && r2 == 0 && r3 == 0) {
-                        continue;
-                    }
-
-                    evaluateBoard(r1, r2, r3);
-                }
-            }
+        if (memo.containsKey(key)) {
+            return memo.get(key);
         }
-    }
 
-    public void evaluateBoard(int r1, int r2, int r3) {
+        // Base losing state: only poison square remains
+        if (isOnlyPoisonLeft(rows)) {
+            memo.put(key, false);
+            return false;
+        }
 
-        boolean winningBoard = false;
-        int[] rows = {r1, r2, r3};
+        int size = rows.length;
 
-        for (int row = 0; row < 3; row++) {
+        for (int row = 0; row < size; row++) {
             int length = rows[row];
 
-            for (int col = 1; col <= length; col++) {
-
-                int nr1 = r1;
-                int nr2 = r2;
-                int nr3 = r3;
-
-                int newVal = col - 1;
-
-                if (row == 0) {
-                    nr1 = newVal;
-                    nr2 = Math.min(nr2, newVal);
-                    nr3 = Math.min(nr3, newVal);
-                } else if (row == 1) {
-                    nr2 = newVal;
-                    nr3 = Math.min(nr3, newVal);
-                } else {
-                    nr3 = newVal;
+            for (int col = 0; col < length; col++) {
+                // Skip taking poison directly in recursive search
+                if (row == 0 && col == 0) {
+                    continue;
                 }
 
-                if (nr1 == 0) continue;
+                int[] next = applyMove(rows, row, col);
 
-                if (nr1 >= nr2 && nr2 >= nr3) {
-                    if (isLosingBoard(nr1, nr2, nr3)) {
-                        winningBoard = true;
-                    }
+                if (next[0] == 0) {
+                    continue;
+                }
+
+                if (!isWinning(next)) {
+                    memo.put(key, true);
+                    return true;
                 }
             }
         }
 
-        if (winningBoard) {
-            addWinningBoard(r1, r2, r3);
-        } else {
-            addLosingBoard(r1, r2, r3);
-        }
-    }
-
-    public boolean isLosingBoard(int r1, int r2, int r3) {
-        for (int i = 0; i < losingCount; i++) {
-            if (losingBoards[i][0] == r1 &&
-                    losingBoards[i][1] == r2 &&
-                    losingBoards[i][2] == r3) {
-                return true;
-            }
-        }
+        memo.put(key, false);
         return false;
     }
 
-    public void addLosingBoard(int r1, int r2, int r3) {
-        losingBoards[losingCount][0] = r1;
-        losingBoards[losingCount][1] = r2;
-        losingBoards[losingCount][2] = r3;
-        losingCount++;
+    // Apply click at (row, col):
+    // remove everything at rows >= row and cols >= col
+    public int[] applyMove(int[] rows, int moveRow, int moveCol) {
+        int[] next = Arrays.copyOf(rows, rows.length);
+
+        for (int r = moveRow; r < next.length; r++) {
+            next[r] = Math.min(next[r], moveCol);
+        }
+
+        return next;
     }
 
-    public void addWinningBoard(int r1, int r2, int r3) {
-        winningBoards[winningCount][0] = r1;
-        winningBoards[winningCount][1] = r2;
-        winningBoards[winningCount][2] = r3;
-        winningCount++;
-    }
+    public boolean isOnlyPoisonLeft(int[] rows) {
+        if (rows[0] != 1) {
+            return false;
+        }
 
-    public Point optimalMove(int r1, int r2, int r3) {
-
-        int[] rows = {r1, r2, r3};
-
-        for (int row = 0; row < 3; row++) {
-            int length = rows[row];
-
-            for (int col = 1; col <= length; col++) {
-
-                int nr1 = r1;
-                int nr2 = r2;
-                int nr3 = r3;
-
-                int newVal = col - 1;
-
-                if (row == 0) {
-                    nr1 = newVal;
-                    nr2 = Math.min(nr2, newVal);
-                    nr3 = Math.min(nr3, newVal);
-                } else if (row == 1) {
-                    nr2 = newVal;
-                    nr3 = Math.min(nr3, newVal);
-                } else {
-                    nr3 = newVal;
-                }
-
-                if (nr1 == 0) continue;
-
-                if (nr1 >= nr2 && nr2 >= nr3) {
-                    if (isLosingBoard(nr1, nr2, nr3)) {
-                        int x = col - 1;
-                        int y = row;
-
-                        return new Point(y, x); //returning move coordinates
-                    }
-                }
+        for (int i = 1; i < rows.length; i++) {
+            if (rows[i] != 0) {
+                return false;
             }
         }
 
-        return null;
+        return true;
+    }
+
+    public String encode(int[] rows) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < rows.length; i++) {
+            sb.append(rows[i]).append(',');
+        }
+
+        return sb.toString();
     }
 }
