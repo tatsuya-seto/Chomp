@@ -13,7 +13,7 @@ public class MyChomp {
     public MyChomp() {
 
         // base losing board
-        addLosingBoard(1,0,0);
+        addLosingBoard(1,0,0);//losing
 
         for(int r1=1;r1<=3;r1++){
             for(int r2=0;r2<=r1;r2++){
