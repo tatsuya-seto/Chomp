@@ -40,6 +40,23 @@ public class MyChomp {
         System.out.println("\nLOSING BOARDS:");
 
         printBoards(losingBoards, losingCount);//printing all losing boards
+
+        System.out.println("\nALL POSSIBLE BOARDS:");
+
+        printAllBoards(0, 3, new int[3]);
+    }
+
+    public void printAllBoards(int row, int maxForThisRow, int[] current) {
+        if(row == 3){
+            if(current[0] > 0){
+                System.out.println(current[0] + "," + current[1] + "," + current[2]);
+            }
+            return;
+        }
+        for(int val = maxForThisRow; val >= 0; val--){
+            current[row] = val;
+            printAllBoards(row + 1, val, current);
+        }
     }
 
     public void evaluateBoard(int r1,int r2,int r3){
